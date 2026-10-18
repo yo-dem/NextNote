@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>NextNote</title>
 <style>
-/* Layout: barra strumenti in alto, indice delle sezioni a sinistra, editor come foglio centrale, barra di stato in basso */
+/* Layout: nome del file in alto, indice delle card a sinistra, lavagna centrale e barra di stato in basso */
 :root{
   --bg:#edf0f3; --surface:#ffffff; --ink:#1a2330; --muted:#5f6b7a; --line:#d9dfe6; --line-strong:#b9c3ce;
   --accent:#0f6b6a; --accent-ink:#ffffff; --accent-soft:#e0efee; --h2:#33506d;
@@ -36,11 +36,12 @@ body{background:var(--bg);color:var(--ink);font-family:var(--font-ui);font-size:
 .toolbar{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;padding-block:12px}
 .toolbar .spacer{flex:1}
 .group{display:flex;flex-wrap:wrap;align-items:center;gap:6px}
-.btn{height:32px;padding:0 12px;display:inline-flex;align-items:center;gap:6px;font:500 13px/1 var(--font-ui);color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:7px;cursor:pointer;white-space:nowrap}
+.btn{height:40px;padding:0 12px;display:inline-flex;align-items:center;gap:6px;font:500 13px/1 var(--font-ui);color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:7px;cursor:pointer;white-space:nowrap}
 .btn:hover{border-color:var(--line-strong)}
 .btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
-.btn.icon{width:32px;padding:0;justify-content:center}
-.btn svg{flex:none}
+.btn.icon{width:40px;padding:0;justify-content:center}
+.btn svg{flex:none;width:24px;height:24px}
+.btn.icon:not(:has(svg)){font-size:24px}
 button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .filename{font:600 15px var(--font-ui);color:var(--ink);background:transparent;border:1px solid transparent;border-radius:7px;padding:5px 8px;width:min(260px,52vw)}
 .filename:hover{border-color:var(--line)}
@@ -60,12 +61,6 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline
 .filter{margin:0 12px 6px;height:30px;padding:0 10px;font:13px var(--font-ui);color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:6px}
 .outline{list-style:none;margin:0;padding:2px 6px 10px;overflow:auto;flex:1;min-height:0}
 .ol-item{display:flex;align-items:center;padding-left:calc(var(--depth) * 14px);border-radius:6px}
-.ol-item.is-current{background:var(--accent-soft)}
-.ol-toggle,.ol-spacer{flex:none;width:22px;height:26px;display:grid;place-items:center;padding:0;border:0;background:none;color:var(--muted);cursor:pointer;border-radius:5px}
-.ol-toggle:hover{color:var(--accent)}
-.ol-toggle svg{transition:transform .15s}
-.ol-item.is-closed .ol-toggle svg{transform:rotate(-90deg)}
-.ol-item.is-closed .ol-toggle{color:var(--accent)}
 .ol-title{flex:1;min-width:0;padding:5px 6px 5px 2px;border:0;background:none;color:var(--ink);font:13px/1.35 var(--font-ui);text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer;border-radius:5px}
 .ol-title:hover{color:var(--accent)}
 .lv0 .ol-title{font-weight:700;color:var(--accent);letter-spacing:.03em}
@@ -104,6 +99,8 @@ kbd{font:11px var(--font-mono);padding:1px 5px;border:1px solid var(--line);bord
 .panel-head .count{margin-left:auto}
 .side-close{align-self:center;width:24px;height:24px;margin:-4px -6px -4px 6px;padding:0;display:inline-flex;align-items:center;justify-content:center;border:0;border-radius:5px;background:none;color:var(--muted);cursor:pointer}
 .side-close:hover{color:var(--accent);background:var(--bg)}
+.side-close{width:28px;height:28px}
+.side-close svg{width:20px;height:20px}
 @media (max-width:760px){ .side-close{display:none} }
 @media (max-width:760px){
   .workspace{grid-template-columns:minmax(0,1fr)}
@@ -113,67 +110,6 @@ kbd{font:11px var(--font-mono);padding:1px 5px;border:1px solid var(--line);bord
   .backdrop.open{display:block;position:fixed;inset:0;z-index:25;background:var(--shade)}
 }
 @media (prefers-reduced-motion:reduce){ *{transition:none!important} }
-
-/* ---- CodeMirror 5: regole di base ---- */
-.CodeMirror{position:absolute;inset:0;overflow:hidden;font-family:var(--font-ui);font-size:15px;line-height:1.6;color:var(--ink);background:var(--surface);direction:ltr}
-.CodeMirror-lines{padding:14px 0 120px;cursor:text;min-height:1px}
-.CodeMirror pre.CodeMirror-line,.CodeMirror pre.CodeMirror-line-like{padding:0 22px 0 10px;border-radius:0;border-width:0;background:transparent;font-family:inherit;font-size:inherit;margin:0;white-space:pre;word-wrap:normal;line-height:inherit;color:inherit;z-index:2;position:relative;overflow:visible;-webkit-tap-highlight-color:transparent;font-variant-ligatures:contextual}
-.CodeMirror-wrap pre.CodeMirror-line,.CodeMirror-wrap pre.CodeMirror-line-like{word-wrap:break-word;white-space:pre-wrap;word-break:normal}
-.CodeMirror-scroll{overflow:scroll!important;margin-bottom:-50px;margin-right:-50px;padding-bottom:50px;height:100%;outline:none;position:relative;z-index:0}
-.CodeMirror-sizer{position:relative;border-right:50px solid transparent}
-.CodeMirror-vscrollbar,.CodeMirror-hscrollbar,.CodeMirror-scrollbar-filler,.CodeMirror-gutter-filler{position:absolute;z-index:6;display:none;outline:none}
-.CodeMirror-vscrollbar{right:0;top:0;overflow-x:hidden;overflow-y:scroll}
-.CodeMirror-hscrollbar{bottom:0;left:0;overflow-y:hidden;overflow-x:scroll}
-.CodeMirror-scrollbar-filler{right:0;bottom:0;background:var(--surface)}
-.CodeMirror-gutter-filler{left:0;bottom:0;background:var(--surface)}
-.CodeMirror-gutters{position:absolute;left:0;top:0;min-height:100%;z-index:3;white-space:nowrap;background:var(--surface);border-right:0}
-.CodeMirror-gutter{white-space:normal;height:100%;display:inline-block;vertical-align:top;margin-bottom:-50px}
-.CodeMirror-gutter-wrapper{position:absolute;z-index:4;background:none!important;border:none!important}
-.CodeMirror-gutter-background{position:absolute;top:0;bottom:0;z-index:4}
-.CodeMirror-gutter-elt{position:absolute;cursor:default;z-index:4}
-.CodeMirror-gutter-wrapper ::selection{background-color:transparent}
-.CodeMirror-linenumber{padding:0 4px 0 10px;min-width:24px;text-align:right;white-space:nowrap;color:var(--muted);opacity:.7;font-family:var(--font-mono);font-size:calc(15px * .8);line-height:calc(15px * 1.6);font-variant-numeric:tabular-nums}
-.CodeMirror-linebackground{position:absolute;left:0;right:0;top:0;bottom:0;z-index:0}
-.CodeMirror-linewidget{position:relative;z-index:2;padding:.1px}
-.CodeMirror-code{outline:none}
-.CodeMirror-measure{position:absolute;width:100%;height:0;overflow:hidden;visibility:hidden}
-.CodeMirror-measure pre{position:static}
-.CodeMirror-cursor{position:absolute;pointer-events:none;border-left:2px solid var(--accent);border-right:none;width:0}
-div.CodeMirror-cursors{visibility:hidden;position:relative;z-index:3}
-.CodeMirror-focused div.CodeMirror-cursors{visibility:visible}
-div.CodeMirror-dragcursors{visibility:visible}
-.CodeMirror-selected{background:var(--sel-blur)}
-.CodeMirror-focused .CodeMirror-selected{background:var(--sel)}
-.CodeMirror-line::selection,.CodeMirror-line>span::selection,.CodeMirror-line>span>span::selection{background:var(--sel)}
-span.CodeMirror-selectedtext{background:none}
-.cm-tab{text-indent:0;display:inline-block;width:1.6em;overflow:hidden;vertical-align:top;text-decoration:inherit}
-.cm-force-border{padding-right:.1px}
-
-/* ---- rientri: guide verticali e pallino effimero (solo grafico, non finisce nel testo) davanti a ogni riga-foglia ----
-   le variabili --off (larghezza del rientro) e --gw (larghezza delle guide) le imposta renderLine; il pallino sta
-   nell'ultima colonna del rientro, centrato sulla prima riga visiva, così una riga che va a capo resta distinguibile dalla successiva */
-.CodeMirror pre.CodeMirror-line.ind{
-  background-image:radial-gradient(circle,var(--dot) 0 .13em,transparent .16em),repeating-linear-gradient(to right,var(--guide) 0 1px,transparent 1px 1.6em);
-  background-size:1.2em 1.6em,var(--gw) 100%;
-  background-position:calc(var(--editor-inset,10px) + var(--off) - 1.2em) 0,var(--editor-inset,10px) 0;
-  background-repeat:no-repeat;
-}
-.CodeMirror pre.CodeMirror-line.ind:is(.h-l0,.h-l1,.h-l2,.h-l3,.ind-blank){background-image:none,repeating-linear-gradient(to right,var(--guide) 0 1px,transparent 1px 1.6em)}
-
-/* ---- titoli e piegatura ---- */
-.h-l0{font-weight:700;color:var(--accent);letter-spacing:.04em}
-.h-l0-bg{background:var(--accent-soft)}
-.h-l1{font-weight:700;color:var(--ink)}
-.h-l2{font-weight:600;color:var(--h2)}
-.h-l3{font-weight:600;font-style:italic;color:var(--h2)}
-.fold-gutter{width:22px}
-.fold-arrow{width:22px;height:calc(15px * 1.6);display:grid;place-items:center;color:var(--muted);cursor:pointer;opacity:.5;transition:opacity .15s}
-.CodeMirror:hover .fold-arrow,.fold-arrow.closed{opacity:1}
-.fold-arrow:hover{color:var(--accent)}
-.fold-arrow.closed{color:var(--accent)}
-.fold-arrow.closed svg{transform:rotate(-90deg)}
-.fold-chip{text-indent:0;display:inline-block;margin-left:.7em;padding:0 .6em;border-radius:999px;background:var(--accent-soft);color:var(--accent);font:500 .8em/1.65 var(--font-mono);font-style:normal;letter-spacing:0;cursor:pointer;vertical-align:1px;user-select:none}
-.fold-chip:hover{background:var(--accent);color:var(--accent-ink)}
 
 /* ---- diorama: mappa concettuale su una lavagna infinita, segue il tema della pagina ---- */
 .dio-card{position:relative}
@@ -198,8 +134,6 @@ span.CodeMirror-selectedtext{background:none}
 .dcard textarea{display:block;width:100%;margin:0;padding:0;border:0;background:none;resize:none;overflow:hidden;outline:none;color:var(--ink)}
 .dcard:not(.editing) textarea{pointer-events:none}
 .dcard-title{font:600 14px/1.35 var(--font-ui);padding-right:18px!important}
-.dcard-text{margin-top:6px!important;font:13px/1.5 var(--font-ui);color:var(--muted)!important}
-.dcard:not(.editing) .dcard-text.empty{display:none}
 .dcard-del{position:absolute;top:5px;right:5px;width:22px;height:22px;padding:0;border:0;border-radius:5px;background:none;color:var(--muted);font:16px/1 var(--font-ui);cursor:pointer;opacity:0}
 .dcard-del:hover{color:var(--ink);background:var(--bg)}
 .dcard-port{position:absolute;right:-8px;top:50%;width:14px;height:14px;margin-top:-7px;border-radius:50%;background:var(--surface);border:2px solid var(--accent);cursor:crosshair;opacity:0;transition:opacity .12s}
@@ -208,7 +142,7 @@ span.CodeMirror-selectedtext{background:none}
 .dio-label{position:absolute;transform:translate(-50%,-50%);width:170px;height:26px;padding:0 8px;font:12px var(--font-ui);color:var(--ink);background:var(--surface);border:1px solid var(--accent);border-radius:6px;text-align:center;outline:none}
 .dio-hint{position:absolute;left:14px;top:12px;right:200px;font-size:12px;line-height:1.45;color:var(--muted);pointer-events:none}
 .dio-tools{position:absolute;top:50%;right:10px;transform:translateY(-50%);display:flex;flex-direction:column;gap:6px;padding:6px;background:var(--surface);border:1px solid var(--line);border-radius:10px;box-shadow:0 2px 10px var(--shade)}
-.dio-tools .btn{width:32px;height:32px}
+.dio-tools .btn{width:40px;height:40px;flex:none}
 .dio-tools-left{left:10px;right:auto}
 
 [hidden]{display:none!important}
@@ -225,11 +159,6 @@ html,body{margin:0;height:100%;overflow:hidden}
 .dcard:not(.editing) textarea{pointer-events:auto}
 .dcard.body-empty .card-editor{display:none}
 .card-editor{position:relative;flex:1;min-height:0;margin-top:8px;cursor:text}
-.card-editor .CodeMirror{font-size:15px;border-top:0;color:var(--muted)}
-.card-editor :is(.h-l0,.h-l1,.h-l2,.h-l3){color:var(--muted)}
-.card-editor .h-l0-bg{background:transparent}
-.card-editor .CodeMirror-lines{padding:8px 0}
-.card-editor .CodeMirror pre.CodeMirror-line,.card-editor .CodeMirror pre.CodeMirror-line-like{padding-right:10px}
 .dcard-port{opacity:0;visibility:hidden;pointer-events:none;touch-action:none}
 .dcard:hover .dcard-port{opacity:1;visibility:visible;pointer-events:auto}
 .dcard.sel:not(:hover) .dcard-port{opacity:0;visibility:hidden;pointer-events:none}
@@ -239,10 +168,6 @@ html,body{margin:0;height:100%;overflow:hidden}
 .dcard-port[data-side="bottom"]{bottom:-8px;top:auto;left:50%;right:auto;margin:0;transform:translateX(-50%)}
 .dcard-size{width:20px;height:20px;cursor:nwse-resize;touch-action:none;opacity:.7}
 .card-color{position:absolute;top:7px;right:30px;width:20px;height:20px;padding:0;border:1px solid var(--line);border-radius:5px;background:var(--card-border,var(--line-strong));cursor:pointer}
-.card-fold{position:absolute;top:6px;right:55px;width:22px;height:22px;padding:0;display:grid;place-items:center;border:0;border-radius:5px;background:none;color:var(--muted);cursor:pointer}
-.card-fold:hover{color:var(--accent);background:var(--bg)}
-.card-fold:disabled{opacity:.3;cursor:default}
-.card-fold[aria-pressed="true"] svg{transform:rotate(180deg)}
 .card-palette{position:absolute;top:34px;right:10px;z-index:12;display:flex;gap:8px;padding:10px;background:var(--surface);border:1px solid var(--line-strong);border-radius:8px;box-shadow:0 6px 20px var(--shade)}
 .card-swatch{width:24px;height:24px;padding:0;border:2px solid transparent;border-radius:50%;background:var(--swatch);cursor:pointer}
 .card-swatch[aria-pressed="true"]{outline:2px solid var(--ink);outline-offset:2px}
@@ -253,9 +178,6 @@ html,body{margin:0;height:100%;overflow:hidden}
 .settings-field{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-top:20px}
 .settings-field select{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line-strong);border-radius:6px;padding:6px 10px}
 .settings p{font-size:13px;line-height:1.5;color:var(--muted);margin:18px 0 0}
-.CodeMirror-scroll{overflow-x:hidden!important}
-.CodeMirror-hscrollbar{display:none!important}
-.CodeMirror-wrap pre.CodeMirror-line,.CodeMirror-wrap pre.CodeMirror-line-like{overflow-wrap:anywhere;word-break:break-word}
 .dcard-del{opacity:.7}
 .dio-tools{max-height:calc(100% - 20px);overflow-y:auto}
 .dio-hint{top:55px;right:24px;max-width:600px}
@@ -277,28 +199,20 @@ html,body{margin:0;height:100%;overflow:hidden}
 .dtab.on{color:var(--accent);background:var(--accent-soft)}
 .dtab:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
 .dtab-label{max-width:180px;overflow:hidden;text-overflow:ellipsis;text-transform:uppercase}
-.dtab-del{width:18px;height:18px;margin-right:-6px;padding:0;border:0;border-radius:4px;background:none;color:inherit;font:14px/1 var(--font-ui);cursor:pointer;opacity:.55}
+.dtab-del{width:22px;height:22px;margin-right:-6px;padding:0;border:0;border-radius:4px;background:none;color:inherit;font:18px/1 var(--font-ui);cursor:pointer;opacity:.55}
 .dtab-del:hover{opacity:1;background:var(--surface)}
 .dtab input{width:150px;height:20px;padding:0 4px;font:inherit;color:var(--ink);background:var(--surface);border:1px solid var(--accent);border-radius:4px;outline:none}
-.dtab-add{flex:none;width:26px;height:26px;padding:0;border:0;border-radius:5px;background:none;color:var(--muted);font:16px/1 var(--font-ui);cursor:pointer}
+.dtab-add{flex:none;width:30px;height:30px;padding:0;border:0;border-radius:5px;background:none;color:var(--muted);font:22px/1 var(--font-ui);cursor:pointer}
 .dtab-add:hover{color:var(--ink);background:var(--bg)}
 
-/* Lo zoom usa dimensioni reali: CodeMirror misura testo e cursore nello stesso spazio. */
-.dio-world{--board-scale:1;--editor-inset:calc(2px * var(--board-scale))}
+/* Lo zoom scala dimensioni e testo nello stesso spazio. */
+.dio-world{--board-scale:1}
 .dio-world .dcard{min-width:calc(240px * var(--board-scale));min-height:calc(46px * var(--board-scale));padding:calc(12px * var(--board-scale));border-width:calc(1px * var(--board-scale));border-radius:calc(10px * var(--board-scale))}
-.dio-world .dcard-title{font-size:calc(14px * var(--board-scale));padding-right:calc(74px * var(--board-scale))!important}
-.dio-world .card-editor{margin-top:calc(8px * var(--board-scale));margin-left:calc(-10px * var(--board-scale))}
-.dio-world .card-editor .CodeMirror{font-size:calc(15px * var(--board-scale))}
-.dio-world .card-editor .CodeMirror-lines{padding:calc(8px * var(--board-scale)) 0}
-.dio-world .card-editor pre.CodeMirror-line,.dio-world .card-editor pre.CodeMirror-line-like{padding-left:var(--editor-inset);padding-right:var(--editor-inset)}
-.dio-world .fold-gutter{width:calc(14px * var(--board-scale))}
-.dio-world .fold-arrow{width:calc(14px * var(--board-scale));height:calc(15px * 1.6 * var(--board-scale))}
-.dio-world .fold-arrow svg{width:calc(10px * var(--board-scale));height:calc(10px * var(--board-scale))}
-.dio-world .CodeMirror-linenumber{font-size:calc(15px * .8 * var(--board-scale));line-height:calc(15px * 1.6 * var(--board-scale));min-width:calc(24px * var(--board-scale));padding:0 calc(4px * var(--board-scale)) 0 var(--editor-inset)}
-.dio-world .dcard-del{top:calc(5px * var(--board-scale));right:calc(5px * var(--board-scale));width:calc(22px * var(--board-scale));height:calc(22px * var(--board-scale));font-size:calc(16px * var(--board-scale))}
-.dio-world .card-color{top:calc(7px * var(--board-scale));right:calc(30px * var(--board-scale));width:calc(20px * var(--board-scale));height:calc(20px * var(--board-scale))}
-.dio-world .card-fold{top:calc(6px * var(--board-scale));right:calc(55px * var(--board-scale));width:calc(22px * var(--board-scale));height:calc(22px * var(--board-scale))}
-.dio-world .card-fold svg{width:calc(16px * var(--board-scale));height:calc(16px * var(--board-scale))}
+.dio-world .dcard-title{font-size:calc(14px * var(--board-scale));padding-right:calc(60px * var(--board-scale))!important}
+.dio-world .card-editor{margin-top:calc(8px * var(--board-scale))}
+.dio-world .dcard-text{position:absolute;inset:0;height:100%;margin:0!important;min-height:0;padding:calc(8px * var(--board-scale)) 0;font:400 calc(15px * var(--board-scale))/1.6 var(--font-ui);color:var(--muted);overflow:auto;overflow-wrap:anywhere;white-space:pre-wrap;tab-size:4;cursor:text}
+.dio-world .dcard-del{top:calc(5px * var(--board-scale));right:calc(5px * var(--board-scale));width:calc(26px * var(--board-scale));height:calc(26px * var(--board-scale));font-size:calc(22px * var(--board-scale))}
+.dio-world .card-color{top:calc(6px * var(--board-scale));right:calc(35px * var(--board-scale));width:calc(24px * var(--board-scale));height:calc(24px * var(--board-scale))}
 .dio-world .dcard-port{width:calc(14px * var(--board-scale));height:calc(14px * var(--board-scale));border-width:calc(2px * var(--board-scale))}
 .dio-world .dcard-port[data-side="left"]{left:calc(-8px * var(--board-scale))}
 .dio-world .dcard-port[data-side="right"]{right:calc(-8px * var(--board-scale))}
@@ -322,24 +236,21 @@ html,body{margin:0;height:100%;overflow:hidden}
 
   <main class="workspace" id="workspace">
     <aside class="sidebar" id="sidebar">
-      <section class="panel outline-panel" aria-label="Indice delle sezioni">
+      <section class="panel outline-panel" aria-label="Indice delle card">
         <div class="panel-head"><span class="eyebrow">Indice</span><span class="count" id="olCount"></span><button class="side-close" id="btnSideClose" title="Chiudi l’indice (Ctrl+\)" aria-label="Comprimi il pannello"><svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true"><path d="M10 3.5 5.5 8l4.5 4.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></button></div>
         <input class="filter" id="filter" type="search" placeholder="Filtra i titoli…" aria-label="Filtra i titoli">
         <ul class="outline" id="outline"></ul>
       </section>
       <section class="panel help" aria-label="Formato e scorciatoie">
-        <span class="eyebrow">Formato</span>
+        <span class="eyebrow">Scorciatoie</span>
         <ul>
-          <li>La struttura la dà il <strong>rientro con i tab</strong>: una riga seguita da righe più rientrate diventa una sezione comprimibile.</li>
-          <li>Il <strong>toggle nella card</strong> comprime o espande tutte le sue sezioni, incluse le sottosezioni.</li>
-          <li><kbd>Shift</kbd>+clic sulla freccia apre o chiude una sezione con tutto il suo contenuto.</li>
-          <li><kbd>Tab</kbd> / <kbd>Shift+Tab</kbd> cambiano livello. <kbd>Invio</kbd> mantiene il rientro.</li>
+          <li>Ogni card contiene un titolo e un campo di testo semplice. <kbd>Invio</kbd> nel titolo passa al testo.</li>
+          <li><kbd>Ctrl+S</kbd> salva · <kbd>Ctrl+Maiusc+S</kbd> salva con nome.</li>
+          <li>Rotellina sullo sfondo o <kbd>Ctrl</kbd>+rotellina nel testo: zoom della lavagna.</li>
           <li>Doppio clic sul vuoto per creare una card. Trascina il bordo o il titolo per spostarla.</li>
           <li><kbd>Ctrl</kbd>/<kbd>Cmd</kbd>+clic o <kbd>Shift</kbd>+clic aggiunge o rimuove card dalla selezione. <kbd>Shift</kbd>+trascinamento sullo sfondo seleziona un gruppo. Trascina una card selezionata per muoverle insieme.</li>
-          <li>Scrivi sotto il titolo: i rientri con <kbd>Tab</kbd> creano sezioni collassabili.</li>
           <li>Le schede in basso separano i diorami. <strong>+</strong> crea una scheda; doppio clic o <kbd>F2</kbd> sul nome per rinominarla.</li>
           <li>I quattro pallini collegano le card. Trascina l’angolo in basso a destra per ridimensionarle. Il quadratino accanto al titolo cambia il colore del bordo.</li>
-          <li><kbd>Ctrl+.</kbd> sezione corrente · <kbd>Ctrl+S</kbd> salva · Rotellina sullo sfondo o <kbd>Ctrl</kbd>+rotellina nelle card: zoom del diorama.</li>
           <li><kbd>Ctrl+\</kbd> comprime o riapre questo pannello, anche dalla freccia accanto a «Indice».</li>
         </ul>
       </section>
@@ -358,7 +269,7 @@ html,body{margin:0;height:100%;overflow:hidden}
           </svg>
         </div>
       </div>
-      <div class="dio-hint" id="dioHint">Doppio clic sul vuoto per creare una card. Ogni card contiene un titolo e appunti collassabili. Collega le card trascinando uno dei quattro pallini; ridimensionale dall’angolo in basso a destra.</div>
+      <div class="dio-hint" id="dioHint">Doppio clic sul vuoto per creare una card. Ogni card contiene un titolo e appunti di testo. Collega le card trascinando uno dei quattro pallini; ridimensionale dall’angolo in basso a destra.</div>
       <div class="dio-tabs" id="dioTabs" role="tablist" aria-label="Schede del diorama"></div>
       <div class="dio-tools dio-tools-left" role="group" aria-label="File">
       <button class="btn icon" id="btnNew" title="Nuovo documento" aria-label="Nuovo documento">
@@ -375,8 +286,8 @@ html,body{margin:0;height:100%;overflow:hidden}
       </button>
     </div>
       <div class="dio-tools" role="group" aria-label="Strumenti della lavagna">
-        <button class="btn icon" id="dioSnap" aria-pressed="true" aria-label="Griglia" title="Griglia: aggancia gli elementi (Alt durante il trascinamento per disattivarla temporaneamente)"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" aria-hidden="true"><rect x="2" y="2" width="12" height="12" rx="1.5"/><path d="M6 2v12M10 2v12M2 6h12M2 10h12"/></svg></button>
         <button class="btn icon" id="dioFit" aria-label="Centra" title="Centra: inquadra tutti gli elementi"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5.5 2H2v3.5M10.5 2H14v3.5M14 10.5V14h-3.5M5.5 14H2v-3.5"/><circle cx="8" cy="8" r="2.5"/></svg></button>
+        <button class="btn icon" id="dioSnap" aria-pressed="true" aria-label="Griglia" title="Griglia: aggancia gli elementi (Alt durante il trascinamento per disattivarla temporaneamente)"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" aria-hidden="true"><rect x="2" y="2" width="12" height="12" rx="1.5"/><path d="M6 2v12M10 2v12M2 6h12M2 10h12"/></svg></button>
         <button class="btn icon" id="btnSettings" title="Impostazioni" aria-label="Impostazioni" aria-haspopup="dialog"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6.4 1.5h3.2l.4 1.8 1.3.8 1.8-.5 1.6 2.8-1.4 1.2v1.5l1.4 1.2-1.6 2.8-1.8-.5-1.3.8-.4 1.8H6.4L6 13.4l-1.3-.8-1.8.5-1.6-2.8 1.4-1.2V7.6L1.3 6.4l1.6-2.8 1.8.5L6 3.3z"/><circle cx="8" cy="8.3" r="2.1"/></svg></button>
       </div>
     </section>
@@ -391,35 +302,25 @@ html,body{margin:0;height:100%;overflow:hidden}
 <div class="toast" id="toast" role="status"></div>
 <dialog class="settings" id="settings" aria-labelledby="settingsTitle">
  <div class="settings-head"><h2 id="settingsTitle">Impostazioni</h2><button class="btn icon" id="settingsClose" aria-label="Chiudi impostazioni">×</button></div>
- <label class="opt"><input type="checkbox" id="optLineNumbers"><span>Mostra i numeri di riga</span></label>
  <label class="settings-field" for="optTheme"><span>Tema</span><select id="optTheme"><option value="dark">Scuro</option><option value="light">Chiaro</option></select></label>
  <p>Il testo va sempre a capo automaticamente. Le impostazioni vengono ricordate in questo browser.</p>
 </dialog>
 
-<!-- La copia locale è usata senza richieste di rete. Il CDN è solo un ripiego finché non è installata. -->
-<script src="./codemirror.min.js" onerror="document.write('&lt;script src=&quot;https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js&quot;&gt;&lt;\/script&gt;')"></script>
 <script>
 
 (() => {
 "use strict";
-if(typeof CodeMirror==="undefined"){
- document.getElementById("stSaveText").textContent="CodeMirror non disponibile";
- const message=document.getElementById("toast");message.textContent="Installa CodeMirror con Installa-CodeMirror.ps1 per usare NextNote anche offline.";message.classList.add("show");
- return;
-}
 const $ = id => document.getElementById(id);
 const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const store = {
  get(k,d){try{const v=localStorage.getItem(k);return v===null?d:JSON.parse(v)}catch(_){return d}},
  set(k,v){try{localStorage.setItem(k,JSON.stringify(v));return true}catch(_){return false}}
 };
-const prefs=Object.assign({lineNumbers:false,side:true,theme:"dark"},store.get("nextnote.prefs",{}));
+const prefs=Object.assign({side:true,theme:"dark"},store.get("nextnote.prefs",{}));
 delete prefs.fs;
+delete prefs.lineNumbers;
 delete prefs.textSizeVersion;
 const DRAFT_KEY="nextnote.draft.v1", nameEl=$("fileName"), outlineEl=$("outline"), filterEl=$("filter");
-const Pos=CodeMirror.Pos;
-const CHEV='<svg viewBox="0 0 12 12" width="12" height="12" aria-hidden="true"><path d="M3 4.5 6 7.5 9 4.5" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>';
-const TAB_EM=1.6,SPACE_EM=.28;
 let fileHandle=null,draftTimer=0,dirty=false,revision=0,saving=false;
 function savePrefs(){store.set("nextnote.prefs",prefs)}
 function setSave(text,isDirty){dirty=!!isDirty;$("stSaveText").textContent=text;$("stSave").classList.toggle("dirty",dirty)}
@@ -461,8 +362,6 @@ const settings=$("settings");
 $("btnSettings").onclick=()=>settings.showModal();
 $("settingsClose").onclick=()=>settings.close();
 settings.addEventListener("click",e=>{if(e.target===settings){const r=settings.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)settings.close()}});
-$("optLineNumbers").checked=!!prefs.lineNumbers;
-$("optLineNumbers").onchange=()=>{prefs.lineNumbers=$("optLineNumbers").checked;dio.each(c=>{c.editor.cm.setOption("lineNumbers",prefs.lineNumbers);c.editor.cm.refresh()});savePrefs()};
 function updateStatus(){
  const cs=dio.data().cards;
  $("stCount").textContent=cs.length+(cs.length===1?" card":" card")+" · "+cs.reduce((n,c)=>n+c.text.split("\n").length,0)+" righe";
@@ -470,26 +369,16 @@ function updateStatus(){
 function renderOutline(){
  const q=filterEl.value.trim().toLocaleLowerCase(),items=[];
  dio.each(c=>{
-  const sections=c.editor.sections(),match=(c.title+"\n"+c.text).toLocaleLowerCase().includes(q);
-  if(q&&!match)return;
-  items.push('<li class="ol-item lv0" style="--depth:0" data-card="'+c.id+'"><span class="ol-spacer"></span><button class="ol-title" data-jump-card="'+c.id+'">'+esc(c.title||"Senza titolo")+'</button></li>');
-  let hideUntil=-1;
-  sections.forEach(s=>{
-   if(q&&!s.text.toLocaleLowerCase().includes(q))return;
-   if(!q&&s.line<=hideUntil)return;
-   items.push('<li class="ol-item'+(s.closed?' is-closed':'')+'" data-card="'+c.id+'" style="--depth:'+Math.min(10,s.depth+1)+'"><button class="ol-toggle" data-card="'+c.id+'" data-toggle="'+s.line+'" aria-expanded="'+!s.closed+'" aria-label="'+esc((s.closed?"Espandi ":"Comprimi ")+s.text)+'">'+CHEV+'</button><button class="ol-title" data-jump-card="'+c.id+'" data-line="'+s.line+'">'+esc(s.text)+'</button></li>');
-   if(!q&&s.closed)hideUntil=s.end;
-  });
+  if(q&&!(c.title+"\n"+c.text).toLocaleLowerCase().includes(q))return;
+  items.push('<li class="ol-item lv0" style="--depth:0" data-card="'+c.id+'"><button class="ol-title" data-jump-card="'+c.id+'">'+esc(c.title||"Senza titolo")+'</button></li>');
  });
  outlineEl.innerHTML=items.join("")||'<li class="ol-empty">'+(q?"Nessun risultato.":"Crea una card per iniziare.")+'</li>';
  $("olCount").textContent=dio.data().cards.length+" card";
  updateStatus();
 }
 outlineEl.onclick=e=>{
- const tg=e.target.closest("[data-toggle]");
- if(tg){dio.get(tg.dataset.card)?.editor.toggle(+tg.dataset.toggle,e.shiftKey);return}
  const j=e.target.closest("[data-jump-card]");
- if(j){dio.reveal(j.dataset.jumpCard,j.dataset.line===undefined?null:+j.dataset.line);if(mobile.matches)closeDrawer()}
+ if(j){dio.reveal(j.dataset.jumpCard);if(mobile.matches)closeDrawer()}
 };
 filterEl.oninput=renderOutline;
 async function load(text,name,handle){
@@ -558,217 +447,7 @@ window.addEventListener("dragover",e=>{if([...e.dataTransfer.types].includes("Fi
 window.addEventListener("drop",async e=>{const f=e.dataTransfer?.files[0];if(f){e.preventDefault();await load(await f.text(),f.name,null)}});
 window.addEventListener("beforeunload",e=>{if(dirty){e.preventDefault();e.returnValue=""}});
 
-function createEditor(container,card,onChange,onLayout){
-let state={lines:[],ind:[],ends:[],blank:[],handles:[],base:0,sections:0},raf=0,disposed=false,initializing=true;
-const folded=new Set();
-function enterKey(c){
-  ensureFresh();
-  const cur = c.getCursor(), text = c.getLine(cur.line);
-  const lead = text.match(/^[\t ]*/)[0];
-  if (!c.somethingSelected() && cur.ch === text.length){
-    const m = foldMarks().find(mk => { const r = mk.find(); return r && r.from.line === cur.line; });
-    if (m){
-      const r = m.find();
-      c.replaceRange("\n" + lead, r.to);
-      c.setCursor(Pos(r.to.line + 1, lead.length));
-      return;
-    }
-  }
-  c.replaceSelection("\n" + lead.slice(0, Math.min(cur.ch, lead.length)));
-}
-const cm = CodeMirror(container, {
-  value: card.text,
-  lineNumbers: !!prefs.lineNumbers,
-  lineWrapping: true,
-  scrollbarStyle: "null",
-  tabSize: 4, indentUnit: 4, indentWithTabs: true,
-  gutters: ["fold-gutter"],
-  viewportMargin: 40,
-  spellcheck: false,
-  extraKeys: { "Enter": enterKey, "Shift-Tab": "indentLess", "Tab": c => c.somethingSelected() ? c.indentSelection("add") : c.replaceSelection("\t"), "Ctrl-.": toggleAtCursor, "Cmd-.": toggleAtCursor }
-});
-/* rientro sospeso: le righe lunghe vanno a capo allineate al proprio rientro. Guide e pallino sono disegnati dalla regola CSS .ind,
-   che i titoli (classi h-l*) spengono: così cambiare una riga da foglia a titolo non richiede di ridisegnarla */
-cm.on("renderLine", (c, line, elt) => {
-  const lead = line.text.match(/^[\t ]*/)[0];
-  if (!lead) return;
-  const tabs = (lead.match(/\t/g) || []).length;
-  const off = tabs * TAB_EM + (lead.length - tabs) * SPACE_EM;
-  elt.style.textIndent = -off + "em";
-  elt.style.paddingLeft = "calc(var(--editor-inset,10px) + " + off + "em)";
-  elt.classList.add("ind");
-  if (lead.length === line.text.length) elt.classList.add("ind-blank");   /* riga di soli spazi: guide sì, pallino no */
-  elt.style.setProperty("--off", off + "em");
-  elt.style.setProperty("--gw", tabs * TAB_EM + "em");
-});
 
-/* ---------- analisi della struttura (solo rientro) ---------- */
-function indentOf(s){
-  const m = s.match(/^[\t ]*/)[0];
-  const tabs = (m.match(/\t/g) || []).length;
-  return tabs + Math.floor((m.length - tabs) / 4);
-}
-function analyze(){
-  const lines = cm.getValue().split("\n"), n = lines.length;
-  const blank = lines.map(l => l.trim() === "");
-  const ind = lines.map(indentOf);
-  const ends = new Array(n).fill(-1), stack = [];
-  let lastNB = -1, base = Infinity, sections = 0;
-  for (let i = 0; i < n; i++){
-    if (blank[i]) continue;
-    base = Math.min(base, ind[i]);
-    while (stack.length && ind[stack[stack.length - 1]] >= ind[i]){
-      const s = stack.pop(); ends[s] = lastNB > s ? lastNB : -1;
-    }
-    stack.push(i); lastNB = i;
-  }
-  while (stack.length){ const s = stack.pop(); ends[s] = lastNB > s ? lastNB : -1; }
-  for (let i = 0; i < n; i++) if (ends[i] > i) sections++;
-  const handles = [];
-  cm.eachLine(h => { handles.push(h); });
-  state = { lines, ind, ends, blank, handles, base: base === Infinity ? 0 : base, sections };
-}
-const isHead = i => state.ends[i] > i;
-const depth = i => state.ind[i] - state.base;
-function owner(line){
-  for (let j = line; j >= 0; j--) if (isHead(j) && (j === line || state.ends[j] >= line)) return j;
-  return -1;
-}
-
-/* ---------- piegatura ---------- */
-function foldMarks(){ return cm.getAllMarks().filter(m => m.__fold); }
-function makeMark(i, end){
-  const h = state.handles[i], hidden = end - i;
-  const chip = document.createElement("span");
-  chip.className = "fold-chip";
-  chip.textContent = hidden === 1 ? "1 riga" : hidden + " righe";
-  chip.title = "Espandi (Shift+clic: espandi tutto il contenuto)";
-  const m = cm.markText(Pos(i, cm.getLine(i).length), Pos(end, cm.getLine(end).length), { replacedWith: chip });
-  m.__fold = true;
-  chip.addEventListener("mousedown", e => {
-    e.preventDefault(); e.stopPropagation();
-    const line = cm.getLineNumber(h);
-    if (line != null) toggle(line, e.shiftKey);
-  });
-}
-/* allinea i marcatori visibili allo stato logico: si piegano solo le sezioni chiuse non già nascoste da un genitore chiuso */
-function sync(moveCursor){
-  for (const h of folded) if (cm.getLineNumber(h) == null) folded.delete(h);
-  const H = state.handles, cur = cm.getCursor(), desired = new Map();
-  for (let i = 0; i < H.length; i++){
-    if (!folded.has(H[i])) continue;
-    if (!isHead(i)){ folded.delete(H[i]); continue; }
-    const end = state.ends[i];
-    if (cur.line > i && cur.line <= end){
-      if (moveCursor) cm.setCursor(Pos(i, cm.getLine(i).length));
-      else { folded.delete(H[i]); continue; }   /* una modifica ha portato il cursore dentro: apri invece di nasconderlo */
-    }
-    desired.set(i, end);
-    i = end;
-  }
-  cm.operation(() => {
-    for (const m of foldMarks()){
-      const r = m.find();
-      const ok = r && desired.get(r.from.line) === r.to.line &&
-        r.from.ch === cm.getLine(r.from.line).length && r.to.ch === cm.getLine(r.to.line).length;
-      if (ok) desired.delete(r.from.line); else m.clear();
-    }
-    desired.forEach((end, i) => makeMark(i, end));
-  });
-}
-function setFold(h, close){ if (close) folded.add(h); else folded.delete(h); }
-function toggle(i, deep){
-  onChange();
-  ensureFresh();
-  if (!isHead(i)) return;
-  const H = state.handles, close = !folded.has(H[i]);
-  if (deep){ for (let j = i; j <= state.ends[i]; j++) if (isHead(j)) setFold(H[j], close); }
-  else setFold(H[i], close);
-  refresh(true);
-}
-function foldAll(){ ensureFresh(); state.handles.forEach((h, i) => { if (isHead(i)) folded.add(h); }); refresh(true); }
-function unfoldAll(){ folded.clear(); refresh(true); }
-function showLevel(k){
-  ensureFresh();
-  state.handles.forEach((h, i) => { if (isHead(i)) setFold(h, depth(i) >= k - 1); });
-  refresh(true);
-}
-function toggleAtCursor(){
-  ensureFresh();
-  const h = owner(cm.getCursor().line);
-  if (h >= 0) toggle(h, false);
-}
-function jump(i){
-  ensureFresh();
-  for (let j = 0; j < i; j++) if (isHead(j) && state.ends[j] >= i) folded.delete(state.handles[j]);
-  refresh(true);
-  cm.setCursor(Pos(i, cm.getLine(i).length));
-  cm.scrollTo(null, Math.max(0, cm.heightAtLine(i, "local") - 16));
-  cm.focus();
-  closeDrawer();
-}
-
-/* ---------- aggiornamento vista ---------- */
-function gutterEl(closed){
-  const d = document.createElement("div");
-  d.className = "fold-arrow" + (closed ? " closed" : "");
-  d.innerHTML = CHEV;
-  d.title = (closed ? "Espandi" : "Comprimi") + " sezione (Shift+clic: tutto il contenuto)";
-  return d;
-}
-function schedule(){ if (!raf) raf = requestAnimationFrame(() => { raf = 0; refresh(false); }); }
-function ensureFresh(){ if (raf){ cancelAnimationFrame(raf); raf = 0; refresh(false); } }
-function refresh(moveCursor){
-  analyze();
-  sync(!!moveCursor);
-  const H = state.handles;
-  cm.operation(() => {
-    H.forEach((h, i) => {
-      const head = isHead(i);
-      const cls = head ? "h-l" + Math.min(depth(i), 3) : "";
-      if (h._cls !== cls){
-        if (h._cls){ cm.removeLineClass(h, "text", h._cls); cm.removeLineClass(h, "background", h._cls + "-bg"); }
-        if (cls){ cm.addLineClass(h, "text", cls); cm.addLineClass(h, "background", cls + "-bg"); }
-        h._cls = cls;
-      }
-      const g = head ? (folded.has(h) ? "c" : "o") : "";
-      if (h._g !== g){ cm.setGutterMarker(h, "fold-gutter", g ? gutterEl(g === "c") : null); h._g = g; }
-    });
-  });
-  card.folds=[...folded].map(h=>cm.getLineNumber(h)).filter(n=>n!=null);
-  const foldButton=card.el.querySelector(".card-fold"),heads=H.filter((h,i)=>isHead(i));
-  const allClosed=heads.length>0&&heads.every(h=>folded.has(h));
-  foldButton.disabled=heads.length===0;
-  foldButton.setAttribute("aria-pressed",String(allClosed));
-  foldButton.title=heads.length?(allClosed?"Espandi tutte le sezioni della card":"Comprimi tutte le sezioni della card"):"Nessuna sezione da comprimere";
-  foldButton.setAttribute("aria-label",foldButton.title);
-  renderOutline();
-  queueDraft();
-  onLayout();
-}
-
-function renderOutline(){ if(!initializing) window.requestAnimationFrame(()=>{if(!disposed) appOutline()}) }
-function updateStatus(){const p=cm.getCursor();$("stPos").textContent="Rg "+(p.line+1)+", Col "+(p.ch+1)}
-cm.on("changes",()=>{card.text=cm.getValue();schedule();onChange()});
-cm.on("cursorActivity",()=>{updateStatus()});
-cm.on("gutterClick",(c,line,gutter,ev)=>{
- if(gutter==="fold-gutter"||gutter==="CodeMirror-linenumbers"){ensureFresh();if(isHead(line)){toggle(line,!!ev?.shiftKey);onChange()}}
-});
-cm.on("focus",()=>{card.bodyActive=true;card.el.classList.add("editing");onLayout();cm.refresh()});
-cm.on("blur",()=>{card.bodyActive=false;card.el.classList.remove("editing");if(!card.text.trim())onLayout()});
-analyze();
-(card.folds||[]).forEach(n=>{if(Number.isInteger(n)&&state.handles[n])folded.add(state.handles[n])});
-if(folded.size)cm.setCursor(Pos(0,0));
-sync(true);initializing=false;
-schedule();
-return {
- cm,toggle:(i,deep)=>{toggle(i,deep);onChange()},foldAll:()=>{foldAll();onChange()},unfoldAll:()=>{unfoldAll();onChange()},jump,
- sections(){ensureFresh();return state.lines.flatMap((t,i)=>isHead(i)?[{line:i,text:t.trim(),depth:depth(i),end:state.ends[i],closed:folded.has(state.handles[i])}]:[])},
- folds(){ensureFresh();return [...folded].map(h=>cm.getLineNumber(h)).filter(n=>n!=null)},
- destroy(){disposed=true;if(raf)cancelAnimationFrame(raf);cm.getWrapperElement().remove()}
-};
-}
-const appOutline=renderOutline;
 const dio = (function(){
   const vp = $("dio"), world = $("dioWorld"), lg = $("dioLinkG"), tmp = $("dioTmp"), hint = $("dioHint"), tabsEl = $("dioTabs");
   const reduce = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -785,7 +464,7 @@ const dio = (function(){
   const snapW = (w,e) => snap && !e?.altKey ? Math.round(w/GRID)*GRID : w;
 
 
- function cardData(c){return {id:c.id,x:Math.round(c.x),y:Math.round(c.y),w:Math.round(c.w),h:Math.round(c.h),autoHeight:c.autoHeight,title:c.title,text:c.text,color:c.color,folds:c.editor.folds()}}
+ function cardData(c){return {id:c.id,x:Math.round(c.x),y:Math.round(c.y),w:Math.round(c.w),h:Math.round(c.h),autoHeight:c.autoHeight,title:c.title,text:c.text,color:c.color}}
  function snapshot(){return {cards:[...cards.values()].map(cardData),links:links.map(l=>({...l})),view:{...view}}}
   /* ---- schede: ogni scheda è un diorama a sé; solo quella attiva vive nel DOM, le altre restano dati (t.d) ---- */
   let tabs = [], cur = null, tabsKey = "", nextCardNumber = 1;
@@ -894,7 +573,7 @@ const dio = (function(){
   goal=null;if(anim)cancelAnimationFrame(anim);anim=0;
   if(linkRaf)cancelAnimationFrame(linkRaf);linkRaf=0;
   editing=null;sel=null;selectedCards.clear();
-  cards.forEach(c=>{c.editor.destroy();c.el.remove()});cards.clear();links=[];
+  cards.forEach(c=>{c.el.remove()});cards.clear();links=[];
   (Array.isArray(d?.cards)?d.cards:[]).filter(c=>c&&typeof c==="object").forEach(addCard);
   (Array.isArray(d?.links)?d.links:[]).forEach(l=>{
    if(!l)return;
@@ -925,9 +604,9 @@ const dio = (function(){
  function addCard(c){
   let id=cleanId(c.id);if(!id||cards.has(id))id=newId("c");
   const finite=(v,d)=>Number.isFinite(+v)?+v:d;
-  const card={id,x:finite(c.x,0),y:finite(c.y,0),w:clamp(finite(c.w,360),240,1600),h:clamp(finite(c.h,46),46,1600),autoHeight:c.autoHeight===true||c.h==null,title:String(c.title||"").toLocaleUpperCase("it-IT"),text:String(c.text||""),color:PALETTE.some(p=>p.color===c.color)?c.color:null,folds:Array.isArray(c.folds)?c.folds:[]};
+  const card={id,x:finite(c.x,0),y:finite(c.y,0),w:clamp(finite(c.w,360),240,1600),h:clamp(finite(c.h,46),46,1600),autoHeight:c.autoHeight===true||c.h==null,title:String(c.title||"").toLocaleUpperCase("it-IT"),text:String(c.text||""),color:PALETTE.some(p=>p.color===c.color)?c.color:null};
   const el=document.createElement("div");el.className="dcard";el.dataset.id=id;
-  el.innerHTML='<textarea class="dcard-title" rows="1" placeholder="Senza titolo" aria-label="Titolo della card" spellcheck="false"></textarea><div class="card-editor"></div><button class="card-fold" title="Comprimi tutte le sezioni della card" aria-label="Comprimi tutte le sezioni della card" aria-pressed="false" disabled><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 2.5h10M5 8l3-3 3 3M5 12l3-3 3 3"/></svg></button><button class="dcard-del" title="Elimina card" aria-label="Elimina card">×</button><button class="card-color" aria-label="Scegli il colore del bordo" title="Colore del bordo" aria-expanded="false"></button><div class="card-palette" role="group" aria-label="Colori del bordo" hidden></div>'+
+  el.innerHTML='<textarea class="dcard-title" rows="1" placeholder="Senza titolo" aria-label="Titolo della card" spellcheck="false"></textarea><div class="card-editor"><textarea class="dcard-text" aria-label="Testo della card" placeholder="Scrivi un appunto..." spellcheck="false"></textarea></div><button class="dcard-del" title="Elimina card" aria-label="Elimina card">×</button><button class="card-color" aria-label="Scegli il colore del bordo" title="Colore del bordo" aria-expanded="false"></button><div class="card-palette" role="group" aria-label="Colori del bordo" hidden></div>'+
    ["left","top","right","bottom"].map(s=>'<span class="dcard-port" data-side="'+s+'" title="Trascina per collegare una card"></span>').join("")+'<span class="dcard-size" title="Ridimensiona larghezza e altezza"></span>';
   card.el=el;card.tEl=el.querySelector(".dcard-title");card.xEl=el.querySelector(".card-editor");
   card.tEl.value=card.title;card.tEl.readOnly=true;
@@ -949,11 +628,16 @@ const dio = (function(){
   colorEl.onclick=()=>{const open=palette.hidden;closePalettes();palette.hidden=!open;colorEl.setAttribute("aria-expanded",String(open));if(open)palette.querySelector('[aria-pressed="true"]').focus();queueLinks()};
   palette.onclick=e=>{const button=e.target.closest("[data-color]");if(!button)return;card.color=PALETTE[+button.dataset.color].color;place(card);syncPalette();closePalettes();colorEl.focus();changed()};
   world.append(el);cards.set(id,card);place(card);
-  card.editor=createEditor(card.xEl,card,changed,()=>{fitContent(card);queueLinks()});fitContent(card);
-  el.querySelector(".card-fold").onclick=()=>{
-   const sections=card.editor.sections();
-   if(sections.length&&sections.every(s=>s.closed))card.editor.unfoldAll();else card.editor.foldAll();
+  card.bodyEl=el.querySelector(".dcard-text");card.bodyEl.value=card.text;
+  const updatePosition=()=>{
+   const before=card.bodyEl.value.slice(0,card.bodyEl.selectionStart),lines=before.split("\n");
+   $("stPos").textContent="Rg "+lines.length+", Col "+(lines.at(-1).length+1);
   };
+  card.bodyEl.oninput=()=>{card.text=card.bodyEl.value;fitContent(card);changed();updatePosition()};
+  card.bodyEl.onfocus=()=>{editing=card.id;card.bodyActive=true;el.classList.add("editing");select({type:"card",id:card.id});fitContent(card);updatePosition()};
+  card.bodyEl.onblur=()=>{card.bodyActive=false;el.classList.remove("editing");fitContent(card)};
+  card.bodyEl.addEventListener("select",updatePosition);card.bodyEl.addEventListener("keyup",updatePosition);card.bodyEl.addEventListener("click",updatePosition);
+  fitContent(card);
   return card;
  }
  function place(c){
@@ -963,25 +647,26 @@ const dio = (function(){
  function fit(c){
   c.el.classList.toggle("body-empty",c.autoHeight&&!c.text.trim()&&!c.bodyActive);
   c.tEl.style.height="auto";c.tEl.style.height=Math.min(70*view.k,Math.max(20*view.k,c.tEl.scrollHeight))+"px";
-  if(c.editor)c.editor.cm.refresh();queueLinks();
+  queueLinks();
  }
  function fitContent(c){
   fit(c);
   if(!c.autoHeight)return;
   const style=getComputedStyle(c.el),titleHeight=c.tEl.getBoundingClientRect().height;
   let height=parseFloat(style.paddingTop)+parseFloat(style.paddingBottom)+parseFloat(style.borderTopWidth)+parseFloat(style.borderBottomWidth)+titleHeight;
-  if(!c.el.classList.contains("body-empty")&&c.editor){
-   const cm=c.editor.cm,lines=cm.getWrapperElement().querySelector(".CodeMirror-lines");
-   const padding=lines?getComputedStyle(lines):null;
-   const contentHeight=Math.max(24*view.k,cm.heightAtLine(cm.lineCount(),"local")-cm.heightAtLine(0,"local"));
-   height+=parseFloat(getComputedStyle(c.xEl).marginTop)+contentHeight+(padding?parseFloat(padding.paddingTop)+parseFloat(padding.paddingBottom):16*view.k);
+  if(!c.el.classList.contains("body-empty")&&c.bodyEl){
+   const previousHeight=c.bodyEl.style.height;
+   c.bodyEl.style.height="0px";
+   const contentHeight=c.bodyEl.scrollHeight;
+   c.bodyEl.style.height=previousHeight;
+   height+=parseFloat(getComputedStyle(c.xEl).marginTop)+Math.max(24*view.k,contentHeight);
   }
   const nextHeight=clamp(Math.ceil(height/view.k),46,1600);
   if(c.h!==nextHeight){c.h=nextHeight;place(c);fit(c)}
  }
  function edit(c,field){
   select({type:"card",id:c.id});editing=c.id;
-  if(field==="text"){c.bodyActive=true;fitContent(c);c.editor.cm.focus();return}
+  if(field==="text"){c.bodyActive=true;fitContent(c);c.bodyEl.focus();return}
   c.tEl.readOnly=false;c.tEl.focus();c.tEl.setSelectionRange(c.tEl.value.length,c.tEl.value.length);
  }
  function stopEdit(){const c=cards.get(editing);if(c)c.tEl.readOnly=true;editing=null}
@@ -1014,7 +699,7 @@ const dio = (function(){
       if(ids.has(editing))stopEdit();
       const gone=links.filter(l=>ids.has(l.from)||ids.has(l.to)),snapshots=removed.map(cardData);
       links=links.filter(l=>!gone.includes(l));
-      removed.forEach(c=>{c.editor.destroy();c.el.remove();cards.delete(c.id)});
+      removed.forEach(c=>{c.el.remove();cards.delete(c.id)});
       undo=()=>{snapshots.forEach(addCard);links.push(...gone.filter(l=>cards.has(l.from)&&cards.has(l.to)))};
       toast(removed.length===1?"Card eliminata":removed.length+" card eliminate",{label:"Annulla",run:()=>{if(!back())return;undo();changed();drawLinks();syncHint()}});
     } else {
@@ -1326,13 +1011,13 @@ const dio = (function(){
     if (e.button > 1) return;
     const t = e.target, cardEl = t.closest(".dcard"), c = cardEl && cards.get(cardEl.dataset.id);
     const modifier=e.ctrlKey||e.metaKey||e.shiftKey;
-    const controls=t.closest(".dcard-del,.card-fold,.dio-label,.card-color,.card-palette,.dcard-port,.dcard-size,.fold-arrow,.fold-chip,.CodeMirror-gutter-elt");
+    const controls=t.closest(".dcard-del,.dio-label,.card-color,.card-palette,.dcard-port,.dcard-size");
     if(e.button===0&&c&&modifier&&!controls){
       e.preventDefault();e.stopPropagation();stopEdit();
       if(world.contains(document.activeElement))document.activeElement.blur();
       select({type:"card",id:c.id},true);return;
     }
-    if (t.closest(".dcard-del,.card-fold,.dio-label,.card-color,.card-palette,.card-editor")) return;
+    if(t.closest(".dcard-del,.dio-label,.card-color,.card-palette,.card-editor"))return;
     if (e.button === 1 || !c){
       const hitL = e.button === 0 && t.closest("[data-link]");
       if (hitL){ stopEdit(); select({ type:"link", id:hitL.dataset.link }); return; }
@@ -1409,7 +1094,7 @@ const dio = (function(){
   vp.addEventListener("dblclick", e => {
     if(e.ctrlKey||e.metaKey||e.shiftKey)return;
     const t = e.target;
-    if (t.closest(".dcard-del,.card-fold,.dcard-port,.dcard-size,.dio-label,.card-editor,.card-color,.card-palette")) return;
+    if(t.closest(".dcard-del,.dcard-port,.dcard-size,.dio-label,.card-editor,.card-color,.card-palette"))return;
     const cardEl = t.closest(".dcard");
     if (cardEl){
       const c = cards.get(cardEl.dataset.id);
@@ -1456,12 +1141,13 @@ const dio = (function(){
     applyView(); cards.forEach(fit); drawLinks(); syncHint();
   }
 
-  function reveal(id,line){
+  function reveal(id){
    const c=cards.get(id);if(!c)return;
    goal={k:1,x:vp.clientWidth/2-c.x-c.w/2,y:vp.clientHeight/2-c.y-c.h/2};run();select({type:"card",id});
-   if(line===null)edit(c,"title");else c.editor.jump(line);
+   edit(c,"title");
   }
-  new ResizeObserver(()=>{cards.forEach(fit);queueLinks()}).observe(vp);
+  new ResizeObserver(()=>{cards.forEach(fitContent);queueLinks()}).observe(vp);
+  if(document.fonts?.ready)document.fonts.ready.then(()=>cards.forEach(fitContent));
   const overlayObserver=new ResizeObserver(queueLinks);
   overlayObserver.observe(tabsEl);$("dioCard").querySelectorAll(".dio-tools").forEach(el=>overlayObserver.observe(el));
   return {data,load,changed,each:fn=>cards.forEach(fn),get:id=>cards.get(id),reveal,setActive};
@@ -1475,7 +1161,6 @@ dio.load(draft?.document||{cards:[{x:24,y:48,w:560,h:440,title:"DATABASE",text:"
 if(draft?.name)nameEl.value=draft.name;
 dio.setActive(true);savePrefs();renderOutline();
 setSave(draft?"Bozza ripristinata dal browser":"Pronto",!!draft);
-if(document.fonts?.ready)document.fonts.ready.then(()=>dio.each(c=>c.editor.cm.refresh()));
 })();
 </script>
 </body>
